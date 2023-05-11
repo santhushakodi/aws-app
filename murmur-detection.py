@@ -14,6 +14,7 @@ import scipy
 from scipy import signal
 import os
 import cv2
+import hashlib
 
 from tensorflow import keras
 
@@ -191,6 +192,12 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['pwd']
+
+        sha256_hash = hashlib.sha256()
+        # Convert the input string to bytes and update the hash object
+        sha256_hash.update(password.encode('utf-8'))
+        # Get the hexadecimal representation of the hash value
+        password = sha256_hash.hexdigest()
         
         print(email, password)
 
@@ -212,9 +219,9 @@ def login():
             return render_template('index.html')
         else:
             error = 'Invalid username or password'
-            return render_template('login.html', error=error)
+            return render_template('auth-signin.html', error=error)
 
-    return render_template('login.html')
+    return render_template('auth-signin.html')
 
 @app.route('/writedb', methods=['POST'])
 def update():
