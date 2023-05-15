@@ -87,16 +87,17 @@ def dashboard():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if not request.is_json:
-        return jsonify({'error': 'Invalid JSON payload'})
-
-    payload = request.get_json()
-    if 'data' not in payload:
-        return jsonify({'error': 'No array data in the JSON payload'}), 400
-
-    data_list = payload['data']
-    patient_id = payload['patient_id']
-    sampling_rate = payload['sampling_rate']
+    # if not request.is_json:
+    #     print("error 1")
+    #     return jsonify({'error': 'Invalid JSON payload'})
+    if 'data' in request.json and 'sampling_rate' in request.json:
+        data_list = request.json['data']
+        sampling_rate = request.json['sampling_rate']
+        patient_id = request.json['patient_id']
+        
+    else:
+        # Return an error response if required fields are missing
+        return jsonify({'error': 'Invalid request data.'}), 400
 
     # Convert the received list back to a NumPy array
     audio_ = np.array(data_list)
@@ -139,7 +140,7 @@ def predict():
     print(result)
     output = result.tolist()
 
-    if result[0][0] == 1:
+    if result[0][0] >= 0.5:
         outcome = "abnormal"
     else:
         outcome = "normal"
@@ -151,15 +152,16 @@ def predict():
         database="demodb"
         )
     mycursor = mydb.cursor()
-    
-    query1 = "INSERT INTO patients (id, murmur) VALUES (%s, %s)"
+    # patient_id= int(patient_id)
+    query1 = "INSERT INTO newpatients (id, murmur) VALUES (%s, %s)"
     data = (patient_id, outcome)
+    print(data)
     mycursor.execute(query1, data)
     # commit the transaction
     mydb.commit()
     mycursor.close()
     mydb.close()
-    return jsonify({'message': output})
+    return jsonify({'message': 'WAV file received and processed successfully.'}), 200
 
 @app.route('/search', methods=['POST'])
 def murmur_show():
@@ -175,7 +177,7 @@ def murmur_show():
         database="demodb"
         )
     mycursor = mydb.cursor()
-    query2 = "SELECT murmur FROM patients WHERE id=%s"
+    query2 = "SELECT murmur FROM newpatients WHERE id=%s"
     data2 = (pid,)
     mycursor.execute(query2, data2)
     # fetch the result
@@ -241,7 +243,7 @@ def update():
     mycursor = mydb.cursor()
 
     
-    query1 = "INSERT INTO patients (id, murmur) VALUES (%s, %s)"
+    query1 = "INSERT INTO newpatients (id, murmur) VALUES (%s, %s)"
     data = (id, murmur)
     mycursor.execute(query1, data)
     # commit the transaction
