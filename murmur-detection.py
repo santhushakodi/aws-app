@@ -96,6 +96,7 @@ def predict():
 
     data_list = payload['data']
     patient_id = payload['patient_id']
+    sampling_rate = payload['sampling_rate']
 
     # Convert the received list back to a NumPy array
     audio_ = np.array(data_list)
@@ -105,7 +106,7 @@ def predict():
     
     audio_slice = audio_[500:20500]
     
-    filtered_audio = butter_bandpass_filt(audio_slice, 20, 600, 4000,order=12)
+    filtered_audio = butter_bandpass_filt(audio_slice, 20, 600, sampling_rate ,order=12)
 
     array = filtered_audio / np.max(filtered_audio)
 
