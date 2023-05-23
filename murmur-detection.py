@@ -15,6 +15,7 @@ from scipy import signal
 import os
 import cv2
 import hashlib
+import base64
 
 from tensorflow import keras
 
@@ -87,23 +88,33 @@ def dashboard():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    # if not request.is_json:
-    #     print("error 1")
-    #     return jsonify({'error': 'Invalid JSON payload'})
+    
+    
     if 'data' in request.json and 'sampling_rate' in request.json:
         data_list = request.json['data']
         sampling_rate = request.json['sampling_rate']
         patient_id = request.json['patient_id']
+    # print(request.json['patient_id'])
+    # if 'wav_file' in request.files:
+    #     file = request.files['wav_file']
+    #     wav_data = file.read()
+    #     patient_id = request.json['patient_id']    
         
     else:
         # Return an error response if required fields are missing
+        print("incorrect")
         return jsonify({'error': 'Invalid request data.'}), 400
+    
+    # sampling_rate, audio_ = wavfile.read(file)
 
     # Convert the received list back to a NumPy array
     audio_ = np.array(data_list)
     # Load the model from the h5 file
     model = keras.models.load_model('outcome.h5')
-    
+    wavfile.write('heart.wav', sampling_rate, audio_)
+
+    with open('heart.wav', 'rb') as file:
+        binary_data = file.read()
     
     audio_slice = audio_[500:20500]
     
@@ -153,8 +164,10 @@ def predict():
         )
     mycursor = mydb.cursor()
     # patient_id= int(patient_id)
-    query1 = "INSERT INTO newpatients (id, murmur) VALUES (%s, %s)"
-    data = (patient_id, outcome)
+    # query1 = "INSERT INTO newpatients (id, murmur) VALUES (%s, %s)"
+    # data = (patient_id, outcome)
+    query1 = "INSERT INTO patients (patient_id, murmur_case,clinical_outcome,pcg_signal) VALUES (%s, %s,%s, %s)"
+    data = (patient_id, "present",outcome, binary_data)
     print(data)
     mycursor.execute(query1, data)
     # commit the transaction
@@ -177,17 +190,40 @@ def murmur_show():
         database="demodb"
         )
     mycursor = mydb.cursor()
-    query2 = "SELECT murmur FROM newpatients WHERE id=%s"
+    # query2 = "SELECT murmur FROM newpatients WHERE id=%s"
+    # data2 = (pid,)
+    query2 = "SELECT * FROM patients WHERE patient_id=%s"
     data2 = (pid,)
     mycursor.execute(query2, data2)
     # fetch the result
-    murmur = mycursor.fetchone()
+    output = mycursor.fetchone()
+
+    query3 = "SELECT COUNT(*) FROM patients WHERE clinical_outcome = %s"
+    mycursor.execute(query3, ("normal",))
+        
+        # Fetch the result
+    normal_count = mycursor.fetchone()[0]
+
+    query4 = "SELECT COUNT(*) FROM patients WHERE clinical_outcome = %s"
+    mycursor.execute(query4, ("abnormal",))
+        
+        # Fetch the result
+    abnormal_count = mycursor.fetchone()[0]
+
     mycursor.close()
     mydb.close()
     
-    result = {'message': 'Data processed successfully',
+    # result = {'message': 'Data processed successfully',
+    #           'pid':pid,
+    #           'murmur':murmur}
+    wave = base64.b64encode(output[3]).decode('utf-8')
+    result = {'message':'data processed successfully',
               'pid':pid,
-              'murmur':murmur}
+              'murmur':output[2],
+              'wav':wave,
+              'normal_count': normal_count,
+              'abnormal_count': abnormal_count
+              }
     return jsonify(result)
 
 @app.route('/login', methods=['POST'])
@@ -215,11 +251,12 @@ def login():
         user = mycursor.fetchone()
         mycursor.close()
         print(user)
+        data = {"name":user[1]}
 
         if user and password == user[3]:
             session['email'] = email
             # return redirect('/dashboard')
-            return render_template('index.html')
+            return render_template('index.html', data=data)
         else:
             error = 'Invalid username or password'
             return render_template('auth-signin.html', error=error)
