@@ -1032,6 +1032,10 @@ pre[class*=language-]:before {
     background: linear-gradient(45deg, #ab7639, #ffa929) !important;
 }
 
+.bg-c-purple {
+    background: linear-gradient(45deg, #ab3998, #f829ff) !important;
+}
+
 .bg-c-blue {
     background: linear-gradient(45deg, #3949AB, #2962FF) !important;
 }
