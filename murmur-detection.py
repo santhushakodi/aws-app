@@ -100,7 +100,21 @@ pitch_model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
     )
 
-##############################################
+############################################Murmur shape###########################
+
+shape_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+shape_model.load_weights('shape3.h5')
+shape_model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
+    )
+
+################################## Murmur timing ######################################################
+timing_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+timing_model.load_weights('timing.h5')
+timing_model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
+    )
+######################################################################################################
 
 app = Flask(__name__)
 app.secret_key = 'vortex123'
@@ -200,11 +214,7 @@ def predict():
     print("murmur_pitch : ",murmur_pitch)
 
     ######################################murmur shape############################3
-    shape_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
-    shape_model.load_weights('shape3.h5')
-    shape_model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
-        )
+    
     m_shape = shape_model.predict(input_data)
     shape_dict = {0:"Decrescendo", 1:"Diamond", 2:"Plateau"}
 
@@ -212,15 +222,11 @@ def predict():
     print(murmur_shape)
 
     ############################  Murmur timing ################################################
-    timing_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
-    timing_model.load_weights('timing.h5')
-    timing_model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
-        )
+    
     m_timing = shape_model.predict(input_data)
     timing_dict = {0:"early systolic", 1:"holo systolic", 2:"mid systolic"}
 
-    murmur_timing = timing_dict[np.argmax(m_shape)]
+    murmur_timing = timing_dict[np.argmax(m_timing)]
     print(murmur_timing)
 
     mydb = mysql.connector.connect(
@@ -284,11 +290,10 @@ def murmur_show():
     # result = {'message': 'Data processed successfully',
     #           'pid':pid,
     #           'murmur':murmur}
-    wave = base64.b64encode(output[6]).decode('utf-8')
+    # wave = base64.b64encode(output[6]).decode('utf-8')
     result = {'message':'data processed successfully',
               'pid':pid,
               'murmur':output[2],
-              'wav':wave,
               'normal_count': normal_count,
               'abnormal_count': abnormal_count,
               'murmur_timing': output[3],
