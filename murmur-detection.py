@@ -95,7 +95,7 @@ output_layer = tf.keras.layers.Dense(3, activation='softmax')(dense_layer1)
 
 # Create the model
 pitch_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
-pitch_model.load_weights('../pitch_new.h5')
+pitch_model.load_weights('pitch_new.h5')
 pitch_model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
     )
