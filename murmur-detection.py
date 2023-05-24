@@ -136,6 +136,7 @@ def predict():
         data_list = request.json['data']
         sampling_rate = request.json['sampling_rate']
         patient_id = request.json['patient_id']
+        murmur_case = request.json['murmur_case']
     # print(request.json['patient_id'])
     # if 'wav_file' in request.files:
     #     file = request.files['wav_file']
@@ -240,7 +241,7 @@ def predict():
     # query1 = "INSERT INTO newpatients (id, murmur) VALUES (%s, %s)"
     # data = (patient_id, outcome)
     query1 = "INSERT INTO patients (patient_id, murmur_case, clinical_outcome, murmur_timing, murmur_pitch, murmur_shape, pcg_signal) VALUES (%s, %s,%s, %s, %s, %s,%s)"
-    data = (patient_id, "present",outcome, murmur_timing, murmur_pitch, murmur_shape, binary_data)
+    data = (patient_id, murmur_case ,outcome, murmur_timing, murmur_pitch, murmur_shape, binary_data)
     print(data)
     mycursor.execute(query1, data)
     # commit the transaction
