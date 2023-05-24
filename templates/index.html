@@ -52,7 +52,9 @@
         		audioSource.src = "data:audio/wav;base64," + data.wav;
 				document.getElementById("normal-patients").innerHTML = data.normal_count;
 				document.getElementById("abnormal-patients").innerHTML = data.abnormal_count;
-				
+				document.getElementById("murmur-timing").innerHTML = data.murmur_timing;
+				document.getElementById("murmur-pitch").innerHTML = data.murmur_pitch;
+	
 			} catch(error){
 				console.log(error)
 			}
@@ -316,7 +318,7 @@
 											<div class="row align-items-center m-b-25">
 												<div class="col">
 													<h6 class="m-b-5 text-white">Patient ID</h6>
-													<h3 class="m-b-0 text-white" id="patient-id">100</h3>
+													<h3 class="m-b-0 text-white" id="patient-id"></h3>
 												</div>
 												<div class="col-auto">
 													<i class="fas fa-user"></i>
@@ -335,7 +337,7 @@
 											<div class="row align-items-center m-b-25">
 												<div class="col">
 													<h6 class="m-b-5 text-white">Murmur</h6>
-													<h3 class="m-b-0 text-white" id="murmur-status">Present</h3>
+													<h3 class="m-b-0 text-white" id="murmur-status"></h3>
 												</div>
 												<div class="col-auto">
 													<!-- <i class="fas fa-money-bill-alt text-c-red f-18"></i> -->
@@ -354,7 +356,7 @@
 											<div class="row align-items-center m-b-25">
 												<div class="col">
 													<h6 class="m-b-5 text-white">murmur timing</h6>
-													<h4 class="m-b-0 text-white">Early systolic</h3>
+													<h4 class="m-b-0 text-white" id="murmur-timing"></h3>
 												</div>
 												<div class="col-auto">
 													<i class="fas fa-medkit fa-xs"></i>
@@ -370,7 +372,7 @@
 											<div class="row align-items-center m-b-25">
 												<div class="col">
 													<h6 class="m-b-5 text-white">Murmur Pitch</h6>
-													<h3 class="m-b-0 text-white">Harsh</h3>
+													<h3 class="m-b-0 text-white" id="murmur-pitch"></h3>
 												</div>
 												<div class="col-auto">
 													<i class="fas fa-stethoscope fa-lg"></i>
@@ -565,7 +567,7 @@
 																	</div>
 																</td>
 															</tr>
-															<tr>
+															<!-- <tr>
 																<td>Average</td>
 																<td>78%
 																	<div class="progress mt-1" style="height:4px;">
@@ -607,7 +609,7 @@
 																		<div class="progress-bar bg-success rounded" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
 																	</div>
 																</td>
-															</tr>
+															</tr> -->
 															<!-- <tr>
 																<td>8-8-2017</td>
 																<td>624

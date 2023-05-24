@@ -16,8 +16,10 @@ import os
 import cv2
 import hashlib
 import base64
+from scipy.signal import resample
 
 from tensorflow import keras
+from transformers import TFWav2Vec2Model, Wav2Vec2Processor
 
 
 def butter_bandpass(lowcut, highcut, fs, order):
@@ -64,15 +66,41 @@ def plot_spectrogram(location , spectrogram, ax, title):
     ax.set_title(title)
     plt.close()
 
+def truncate_resample_and_pad_wav(audio_data, sample_rate, max_length, target_sample_rate):
 
-# load the model from the file
-# with open('adaboost_classifier_with_spike_removed.pkl', 'rb') as f:
-#     model = pickle.load(f)
+    # Resample the audio data
+    audio_data_resampled = resample(audio_data, int(len(audio_data) * target_sample_rate / sample_rate))
+
+    # Truncate or pad the resampled audio data
+    if len(audio_data_resampled) > max_length:
+        audio_data_resampled = audio_data_resampled[:max_length]
+    elif len(audio_data_resampled) < max_length:
+        padding = np.zeros(max_length - len(audio_data_resampled), dtype=np.int16)
+        audio_data_resampled = np.concatenate((audio_data_resampled, padding))
+
+    return target_sample_rate, audio_data_resampled
 
 
-# def preprocessing(heart_signal):
-#     pass
+################# Murmur pitch transformer model ###########
+model_name = "facebook/wav2vec2-base-960h"  # Replace with the desired pre-trained Wav2Vec2 model
+base_model = TFWav2Vec2Model.from_pretrained(model_name)
+processor = Wav2Vec2Processor.from_pretrained(model_name)
 
+# Add additional layers for classification
+input_layer = tf.keras.layers.Input(shape=(None,), dtype=tf.float32)
+features = base_model(input_layer).last_hidden_state
+pooled_features = tf.keras.layers.GlobalMaxPooling1D()(features)
+dense_layer1 = tf.keras.layers.Dense(10, activation=keras.layers.LeakyReLU(alpha=0.01))(pooled_features)
+output_layer = tf.keras.layers.Dense(3, activation='softmax')(dense_layer1)
+
+# Create the model
+pitch_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+pitch_model.load_weights('../pitch_new.h5')
+pitch_model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
+    )
+
+##############################################
 
 app = Flask(__name__)
 app.secret_key = 'vortex123'
@@ -156,6 +184,45 @@ def predict():
     else:
         outcome = "normal"
 
+
+    ########################################################################
+    max_length = 50000
+    target_sample_rate = 4000
+
+    resampled_sample_rate, truncated_resampled_data = truncate_resample_and_pad_wav(audio_,sampling_rate, max_length, target_sample_rate)
+    input_data = truncated_resampled_data.astype("float32")
+    input_data = input_data.reshape(1,50000,1)
+
+    ####################################  Murmur pitch ###########################
+    output = pitch_model.predict(input_data)
+    pitch_dictionary = {0: "High", 1: "Low", 2: "Medium"}
+    murmur_pitch = pitch_dictionary[np.argmax(output)]
+    print("murmur_pitch : ",murmur_pitch)
+
+    ######################################murmur shape############################3
+    shape_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+    shape_model.load_weights('shape3.h5')
+    shape_model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
+        )
+    m_shape = shape_model.predict(input_data)
+    shape_dict = {0:"Decrescendo", 1:"Diamond", 2:"Plateau"}
+
+    murmur_shape = shape_dict[np.argmax(m_shape)]
+    print(murmur_shape)
+
+    ############################  Murmur timing ################################################
+    timing_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+    timing_model.load_weights('timing.h5')
+    timing_model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
+        )
+    m_timing = shape_model.predict(input_data)
+    timing_dict = {0:"early systolic", 1:"holo systolic", 2:"mid systolic"}
+
+    murmur_timing = timing_dict[np.argmax(m_shape)]
+    print(murmur_timing)
+
     mydb = mysql.connector.connect(
         host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
         user="admin",
@@ -166,8 +233,8 @@ def predict():
     # patient_id= int(patient_id)
     # query1 = "INSERT INTO newpatients (id, murmur) VALUES (%s, %s)"
     # data = (patient_id, outcome)
-    query1 = "INSERT INTO patients (patient_id, murmur_case,clinical_outcome,pcg_signal) VALUES (%s, %s,%s, %s)"
-    data = (patient_id, "present",outcome, binary_data)
+    query1 = "INSERT INTO patients (patient_id, murmur_case, clinical_outcome, murmur_timing, murmur_pitch, murmur_shape, pcg_signal) VALUES (%s, %s,%s, %s, %s, %s,%s)"
+    data = (patient_id, "present",outcome, murmur_timing, murmur_pitch, murmur_shape, binary_data)
     print(data)
     mycursor.execute(query1, data)
     # commit the transaction
@@ -175,6 +242,7 @@ def predict():
     mycursor.close()
     mydb.close()
     return jsonify({'message': 'WAV file received and processed successfully.'}), 200
+
 
 @app.route('/search', methods=['POST'])
 def murmur_show():
@@ -222,7 +290,10 @@ def murmur_show():
               'murmur':output[2],
               'wav':wave,
               'normal_count': normal_count,
-              'abnormal_count': abnormal_count
+              'abnormal_count': abnormal_count,
+              'murmur timing': output[3],
+              'murmur pitch': output[4],
+              'murmur shape':output[5]
               }
     return jsonify(result)
 
