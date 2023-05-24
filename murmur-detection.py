@@ -284,17 +284,18 @@ def murmur_show():
     # result = {'message': 'Data processed successfully',
     #           'pid':pid,
     #           'murmur':murmur}
-    wave = base64.b64encode(output[3]).decode('utf-8')
+    wave = base64.b64encode(output[6]).decode('utf-8')
     result = {'message':'data processed successfully',
               'pid':pid,
               'murmur':output[2],
               'wav':wave,
               'normal_count': normal_count,
               'abnormal_count': abnormal_count,
-              'murmur timing': output[3],
-              'murmur pitch': output[4],
-              'murmur shape':output[5]
+              'murmur_timing': output[3],
+              'murmur_pitch': output[4],
+              'murmur_shape':output[5]
               }
+    print(result)
     return jsonify(result)
 
 @app.route('/login', methods=['POST'])
