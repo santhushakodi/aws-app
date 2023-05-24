@@ -56,6 +56,10 @@
 				document.getElementById("murmur-pitch").innerHTML = data.murmur_pitch;
 				document.getElementById("murmur-case").innerHTML = data.murmur_case;
 				document.getElementById("murmur-shape").innerHTML = data.murmur_shape;
+				document.getElementById("total-patients").innerHTML = data.total_patients;
+				document.getElementById("total-normal").innerHTML = data.normal_count;
+				document.getElementById("total-abnormal").innerHTML = data.abnormal_count;
+
 			} catch(error){
 				console.log(error)
 			}
@@ -427,7 +431,7 @@
 
 												</div>
 												<div class="col text-right">
-													<h3>1,581</h3>
+													<h3 id="total-patients"></h3>
 													<h5 class="text-c-blue mb-0"><span class="text-muted">Total Patients</span></h5>
 												</div>
 											</div>
@@ -459,8 +463,8 @@
 
 												</div>
 												<div class="col text-right">
-													<h3>1,200</h3>
-													<h5 class="text-c-info mb-0"><span class="text-muted">No Murmurs</span></h5>
+													<h3 id="total-normal"></h3>
+													<h5 class="text-c-info mb-0"><span class="text-muted">Normal Patients</span></h5>
 												</div>
 											</div>
 										</div>
@@ -491,8 +495,8 @@
 
 												</div>
 												<div class="col text-right">
-													<h3>381</h3>
-													<h5 class="text-c-red mb-0"><span class="text-muted">Murmurs</span></h5>
+													<h3 id="total-abnormal"></h3>
+													<h5 class="text-c-red mb-0"><span class="text-muted">Abnormal Patients</span></h5>
 												</div>
 											</div>
 										</div>
@@ -531,17 +535,17 @@
 																				class="feather icon-help-circle f-16"></i></a></span></th>
 																<th><span>Abnormal<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
 																				class="feather icon-help-circle f-16"></i></a></span></th>
-																<th><span>AR<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+																<th><span>Early Systolic<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
 																				class="feather icon-help-circle f-16"></i></a></span></th>
-																<th><span>AS<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+																<th><span>Mid Systolic<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
 																				class="feather icon-help-circle f-16"></i></a></span></th>
-																<th><span>TR<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+																<th><span>Holo Systolic<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
 																				class="feather icon-help-circle f-16"></i></a></span></th>
-																<th><span>TS<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+																<th><span>Decrescendo<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
 																				class="feather icon-help-circle f-16"></i></a></span></th>
-																<th><span>PR<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+																<th><span>Diamond<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
 																				class="feather icon-help-circle f-16"></i></a></span></th>
-																<th><span>PS<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+																<th><span>Plateau<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
 																				class="feather icon-help-circle f-16"></i></a></span></th>
 															</tr>
 														</thead>

@@ -284,6 +284,11 @@ def murmur_show():
         # Fetch the result
     abnormal_count = mycursor.fetchone()[0]
 
+    query5 = "SELECT COUNT(*) FROM patients"
+    mycursor.execute(query5)
+    total_patients = mycursor.fetchone()[0]
+
+
     mycursor.close()
     mydb.close()
     
@@ -299,7 +304,8 @@ def murmur_show():
               'abnormal_count': abnormal_count,
               'murmur_timing': output[3],
               'murmur_pitch': output[4],
-              'murmur_shape':output[5]
+              'murmur_shape':output[5],
+              'total_patients':total_patients
               }
     # print(result)
     return jsonify(result)
