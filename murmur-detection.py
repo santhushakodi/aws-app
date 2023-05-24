@@ -293,6 +293,7 @@ def murmur_show():
     # wave = base64.b64encode(output[6]).decode('utf-8')
     result = {'message':'data processed successfully',
               'pid':pid,
+              'murmur_case':output[1],
               'murmur':output[2],
               'normal_count': normal_count,
               'abnormal_count': abnormal_count,

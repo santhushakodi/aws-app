@@ -1028,6 +1028,10 @@ pre[class*=language-]:before {
 
 /*====== Padding , Margin css ends ======*/
 /*====== text-color, background & border css starts ======*/
+.bg-c-brown {
+    background: linear-gradient(45deg, #ab7639, #ffa929) !important;
+}
+
 .bg-c-blue {
     background: linear-gradient(45deg, #3949AB, #2962FF) !important;
 }

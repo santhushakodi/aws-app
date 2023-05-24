@@ -54,7 +54,8 @@
 				document.getElementById("abnormal-patients").innerHTML = data.abnormal_count;
 				document.getElementById("murmur-timing").innerHTML = data.murmur_timing;
 				document.getElementById("murmur-pitch").innerHTML = data.murmur_pitch;
-	
+				document.getElementById("murmur-case").innerHTML = data.murmur_case;
+				document.getElementById("murmur-shape").innerHTML = data.murmur_shape;
 			} catch(error){
 				console.log(error)
 			}
@@ -312,7 +313,7 @@
 							<!-- [ Main Content ] start -->
 							<div class="row">
 
-								<div class="col-xl-3 col-md-6">
+								<div class="col-xl-4 col-md-6">
 									<div class="card prod-p-card bg-c-blue">
 										<div class="card-body">
 											<div class="row align-items-center m-b-25">
@@ -329,14 +330,30 @@
 										</div>
 									</div>
 								</div>
+								<div class="col-xl-4 col-md-6">
+									<div class="card prod-p-card bg-c-brown">
+										<div class="card-body">
+											<div class="row align-items-center m-b-25">
+												<div class="col">
+													<h6 class="m-b-5 text-white">Murmur Case</h6>
+													<h3 class="m-b-0 text-white" id="murmur-case"></h3>
+												</div>
+												<div class="col-auto">
+													<i class="fas fa-heartbeat fa-lg"></i>
+												</div>
+											</div>
+											<!-- <p class="m-b-0 text-white"><span class="label label-warning m-r-10">+52%</span>From Previous Month</p> -->
+										</div>
+									</div>
+								</div>
 
 								<!-- product profit start -->
-								<div class="col-xl-3 col-md-6">
+								<div class="col-xl-4 col-md-6">
 									<div class="card prod-p-card bg-c-red">
 										<div class="card-body">
 											<div class="row align-items-center m-b-25">
 												<div class="col">
-													<h6 class="m-b-5 text-white">Murmur</h6>
+													<h6 class="m-b-5 text-white">Clinical Outcome</h6>
 													<h3 class="m-b-0 text-white" id="murmur-status"></h3>
 												</div>
 												<div class="col-auto">
@@ -350,12 +367,12 @@
 									</div>
 								</div>
 								
-								<div class="col-xl-3 col-md-6">
+								<div class="col-xl-4 col-md-6">
 									<div class="card prod-p-card bg-c-green">
 										<div class="card-body">
 											<div class="row align-items-center m-b-25">
 												<div class="col">
-													<h6 class="m-b-5 text-white">murmur timing</h6>
+													<h6 class="m-b-5 text-white">Murmur Timing</h6>
 													<h4 class="m-b-0 text-white" id="murmur-timing"></h3>
 												</div>
 												<div class="col-auto">
@@ -366,7 +383,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-xl-3 col-md-6">
+								<div class="col-xl-4 col-md-6">
 									<div class="card prod-p-card bg-c-yellow">
 										<div class="card-body">
 											<div class="row align-items-center m-b-25">
@@ -377,6 +394,22 @@
 												<div class="col-auto">
 													<i class="fas fa-stethoscope fa-lg"></i>
 
+												</div>
+											</div>
+											<!-- <p class="m-b-0 text-white"><span class="label label-warning m-r-10">+52%</span>From Previous Month</p> -->
+										</div>
+									</div>
+								</div>
+								<div class="col-xl-4 col-md-6">
+									<div class="card prod-p-card bg-c-brown">
+										<div class="card-body">
+											<div class="row align-items-center m-b-25">
+												<div class="col">
+													<h6 class="m-b-5 text-white">Murmur Shape</h6>
+													<h3 class="m-b-0 text-white" id="murmur-shape"></h3>
+												</div>
+												<div class="col-auto">
+													<i class="fas fa-heartbeat fa-lg"></i>
 												</div>
 											</div>
 											<!-- <p class="m-b-0 text-white"><span class="label label-warning m-r-10">+52%</span>From Previous Month</p> -->
