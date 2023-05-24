@@ -295,7 +295,7 @@ def murmur_show():
               'murmur_pitch': output[4],
               'murmur_shape':output[5]
               }
-    print(result)
+    # print(result)
     return jsonify(result)
 
 @app.route('/login', methods=['POST'])
