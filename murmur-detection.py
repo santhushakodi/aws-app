@@ -242,7 +242,7 @@ def predict():
     # data = (patient_id, outcome)
     query1 = "INSERT INTO patients (patient_id, murmur_case, clinical_outcome, murmur_timing, murmur_pitch, murmur_shape, pcg_signal) VALUES (%s, %s,%s, %s, %s, %s,%s)"
     data = (patient_id, murmur_case ,outcome, murmur_timing, murmur_pitch, murmur_shape, binary_data)
-    print(data)
+    # print(data)
     mycursor.execute(query1, data)
     # commit the transaction
     mydb.commit()
@@ -289,7 +289,30 @@ def murmur_show():
     mycursor.execute(query5)
     total_patients = mycursor.fetchone()[0]
 
+    query6 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
+    mycursor.execute(query6,("early systolic",)) 
+    early_systolic_count = mycursor.fetchone()[0]
 
+    query7 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
+    mycursor.execute(query7,("holo systolic",)) 
+    holo_systolic_count = mycursor.fetchone()[0]
+
+    query8 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
+    mycursor.execute(query8,("mid systolic",)) 
+    mid_systolic_count = mycursor.fetchone()[0]
+
+    query9 = "SELECT COUNT(*) FROM patients WHERE murmur_shape= %s"
+    mycursor.execute(query9,("Decrescendo",))
+    decrescendo_count = mycursor.fetchone()[0]
+
+    query10 = "SELECT COUNT(*) FROM patients WHERE murmur_shape= %s"
+    mycursor.execute(query10,("Diamond",))
+    diamond_count = mycursor.fetchone()[0]
+
+    query11 = "SELECT COUNT(*) FROM patients WHERE murmur_shape= %s"
+    mycursor.execute(query11,("Plateau",))
+    plateau_count = mycursor.fetchone()[0]
+    
     mycursor.close()
     mydb.close()
     
@@ -306,7 +329,13 @@ def murmur_show():
               'murmur_timing': output[3],
               'murmur_pitch': output[4],
               'murmur_shape':output[5],
-              'total_patients':total_patients
+              'total_patients':total_patients,
+              'early_systolic_count':early_systolic_count,
+              'holo_systolic_count':holo_systolic_count,
+              'mid_systolic_count':mid_systolic_count,
+              'decrescendo_count': decrescendo_count,
+              'diamond_count':diamond_count,
+              'plateau_count':plateau_count
               }
     # print(result)
     return jsonify(result)

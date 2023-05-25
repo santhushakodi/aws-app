@@ -60,6 +60,15 @@
 				document.getElementById("total-normal").innerHTML = data.normal_count;
 				document.getElementById("total-abnormal").innerHTML = data.abnormal_count;
 
+				document.getElementById("early-systolic").innerHTML = data.early_systolic_count;
+				document.getElementById("mid-systolic").innerHTML = data.mid_systolic_count;
+				document.getElementById("holo-systolic").innerHTML = data.holo_systolic_count;
+
+				document.getElementById("decrescendo").innerHTML = data.decrescendo_count;
+				document.getElementById("diamond").innerHTML = data.diamond_count;
+				document.getElementById("plateau").innerHTML = data.plateau_count;
+
+
 			} catch(error){
 				console.log(error)
 			}
@@ -563,45 +572,45 @@
 															</tr> -->
 															<tr>
 																<td>Total</td>
-																<td id="normal-patients">7
-																	<div class="progress mt-1" style="height:4px;">
+																<td id="normal-patients">
+																	<!-- <div class="progress mt-1" style="height:4px;">
 																		<div class="progress-bar bg-danger rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-																	</div>
+																	</div> -->
 																</td>
-																<td id="abnormal-patients">485
-																	<div class="progress mt-1" style="height:4px;">
+																<td id="abnormal-patients">
+																	<!-- <div class="progress mt-1" style="height:4px;">
 																		<div class="progress-bar bg-primary rounded" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-																	</div>
+																	</div> -->
 																</td>
-																<td>769
-																	<div class="progress mt-1" style="height:4px;">
+																<td id="early-systolic">
+																	<!-- <div class="progress mt-1" style="height:4px;">
 																		<div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-																	</div>
+																	</div> -->
 																</td>
-																<td>45
-																	<div class="progress mt-1" style="height:4px;">
+																<td id="mid-systolic">
+																	<!-- <div class="progress mt-1" style="height:4px;">
 																		<div class="progress-bar bg-success rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-																	</div>
+																	</div> -->
 																</td>
-																<td>67
-																	<div class="progress mt-1" style="height:4px;">
+																<td id="holo-systolic">
+																	<!-- <div class="progress mt-1" style="height:4px;">
 																		<div class="progress-bar bg-info rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-																	</div>
+																	</div> -->
 																</td>
-																<td>8
-																	<div class="progress mt-1" style="height:4px;">
+																<td id="decrescendo">
+																	<!-- <div class="progress mt-1" style="height:4px;">
 																		<div class="progress-bar bg-danger rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-																	</div>
+																	</div> -->
 																</td>
-																<td>10
-																	<div class="progress mt-1" style="height:4px;">
+																<td id="diamond">
+																	<!-- <div class="progress mt-1" style="height:4px;">
 																		<div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-																	</div>
+																	</div> -->
 																</td>
-																<td>33
-																	<div class="progress mt-1" style="height:4px;">
+																<td id="plateau">
+																	<!-- <div class="progress mt-1" style="height:4px;">
 																		<div class="progress-bar bg-success rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-																	</div>
+																	</div> -->
 																</td>
 															</tr>
 															<!-- <tr>
