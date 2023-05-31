@@ -361,6 +361,10 @@ def murmur_show():
               'plateau_count':plateau_count
               }
     # print(result)
+    if output[1] == "Absent":
+        result['murmur_pitch'] = ""
+        result['murmur_shape'] = ""
+        result['murmur_timing'] = ""
     return jsonify(result)
 
 @app.route('/login', methods=['POST'])
