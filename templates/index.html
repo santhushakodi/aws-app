@@ -37,7 +37,7 @@
 			try{
 				var query = document.getElementById("m-search").value;
 				console.log(query)
-				const response = await fetch('http://13.53.160.167:5000/search', {
+				const response = await fetch('http://127.0.0.1:5000/search', {
 					method: "POST",
 					headers: {
 					'Content-Type': 'application/json'
@@ -45,7 +45,7 @@
 				body: JSON.stringify({"patient_id": query})
 				});
         		const data = await response.json();
-				console.log(data)
+				console.log(data);
 				document.getElementById('patient-id').innerHTML = data.pid;
 				document.getElementById('murmur-status').innerHTML = data.murmur;
 				var audioSource = document.getElementById("audio-source");
@@ -54,7 +54,7 @@
 				document.getElementById("abnormal-patients").innerHTML = data.abnormal_count;
 				document.getElementById("murmur-timing").innerHTML = data.murmur_timing;
 				document.getElementById("murmur-pitch").innerHTML = data.murmur_pitch;
-				document.getElementById("murmur-case").innerHTML = data.murmur_case;
+				document.getElementById("disease").innerHTML = data.disease;
 				document.getElementById("murmur-shape").innerHTML = data.murmur_shape;
 				document.getElementById("total-patients").innerHTML = data.total_patients;
 				document.getElementById("total-normal").innerHTML = data.normal_count;
@@ -75,7 +75,44 @@
 		}
 
 	</script>
+	<script>
+		function openForm() {
+		document.getElementById("myForm").style.display = "block";
+		}
 
+		function closeForm() {
+		document.getElementById("myForm").style.display = "none";
+		}
+
+		async function patientadd(){
+			try{
+				var patient_id = document.getElementById("patient_id").value;
+				var patient_name = document.getElementById("patient_name").value;
+				var doctor_name= document.getElementById("doctor_name").value;
+				var best_heard = document.getElementById("best_heard_location").value;
+				
+				console.log(patient_id, patient_name, doctor_name, best_heard);
+				const response = await fetch('http://127.0.0.1:5000/add', {
+					method: "POST",
+					headers: {
+					'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({"inserted_patient_id": patient_id,
+										  "inserted_doctor_name": doctor_name, 
+										  "inserted_patient_name": patient_name,
+										  "inserted_best_heard": best_heard})
+				});
+        		const data = await response.json();
+				console.log(data)
+				
+			}
+			catch(error){
+				console.log(error);
+			}
+
+		}
+		
+	</script>
 
 	<!-- [ Pre-loader ] start -->
 	<div class="loader-bg">
@@ -194,6 +231,7 @@
 			</ul>
 			<ul class="navbar-nav ml-auto">
 				<li>
+					
 					<!-- <div class="dropdown">
 						<a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="icon feather icon-bell"></i></a>
 						<div class="dropdown-menu dropdown-menu-right notification">
@@ -203,6 +241,7 @@
 									<a href="#!" class="m-r-10">mark as read</a>
 									<a href="#!">clear all</a>
 								</div>
+							
 							</div>
 							<ul class="noti-body">
 								<li class="n-title">
@@ -348,8 +387,8 @@
 										<div class="card-body">
 											<div class="row align-items-center m-b-25">
 												<div class="col">
-													<h6 class="m-b-5 text-white">Murmur Case</h6>
-													<h3 class="m-b-0 text-white" id="murmur-case"></h3>
+													<h6 class="m-b-5 text-white">Disease</h6>
+													<h3 class="m-b-0 text-white" id="disease"></h3>
 												</div>
 												<div class="col-auto">
 													<i class="fas fa-ambulance fa-lg"></i>
@@ -915,6 +954,24 @@
 												<div class="col-auto"><a href="#!"><i class="fab fa-twitter text-c-info f-22"></i></a></div>
 												<div class="col-auto"><a href="#!"><i class="fab fa-dribbble text-c-red f-22"></i></a></div>
 											</div> -->
+											<button class="open-button" onclick="openForm()">Add patient</button>
+
+											<!-- The form -->
+											<div class="form-popup" id="myForm">
+												<div class="form-container">
+												<h1>Login</h1>
+											
+												<!-- <label for="email"><b>Email</b></label> -->
+												<input type="text" placeholder="patient id" id="patient_id" required>
+												<input type="text" placeholder="patient name" id="patient_name" required>
+												<!-- <label for="psw"><b>Password</b></label> -->
+												<input type="text" placeholder="Doctor name" id="doctor_name" required>
+												<input type="text" placeholder="Best heard location" id="best_heard_location" required>
+											
+												<button type="submit" class="btn" onclick="patientadd()">Add</button>
+												<button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+												</div>
+											</div>
 										</div>
 									</div>
 									<div>

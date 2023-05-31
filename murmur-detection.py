@@ -80,7 +80,21 @@ def truncate_resample_and_pad_wav(audio_data, sample_rate, max_length, target_sa
 
     return target_sample_rate, audio_data_resampled
 
+def predict_disease(best_heard, timing, pitch, shape):
+    disease = ""
+    if best_heard=="MV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
+        disease = "MR"
+    if best_heard=="AV" and timing == "mid systolic" and shape == "Diamond":
+        disease = "AS"
+    if best_heard=="PV" and timing == "mid systolic" and pitch == "High" and shape == "Diamond":
+        disease = "ASD"
+    if best_heard=="TV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
+        disease = "VSD"
+    return disease
+    
+    
 
+    
 ################# Murmur pitch transformer model ###########
 model_name = "facebook/wav2vec2-base-960h"  # Replace with the desired pre-trained Wav2Vec2 model
 base_model = TFWav2Vec2Model.from_pretrained(model_name)
@@ -130,8 +144,6 @@ def dashboard():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    
-    
     if 'data' in request.json and 'sampling_rate' in request.json:
         data_list = request.json['data']
         sampling_rate = request.json['sampling_rate']
@@ -313,8 +325,19 @@ def murmur_show():
     mycursor.execute(query11,("Plateau",))
     plateau_count = mycursor.fetchone()[0]
     
+    query12 = "SELECT * FROM patient_details WHERE patient_id=%s"
+    data12 = (pid,)
+    mycursor.execute(query12, data12)
+    # fetch the result
+    detail = mycursor.fetchone()
     mycursor.close()
     mydb.close()
+
+    if detail:
+        disease = predict_disease(detail[3],output[3],output[4],output[5])
+    else:
+        disease = ""
+    print(disease)
     
     # result = {'message': 'Data processed successfully',
     #           'pid':pid,
@@ -322,7 +345,7 @@ def murmur_show():
     # wave = base64.b64encode(output[6]).decode('utf-8')
     result = {'message':'data processed successfully',
               'pid':pid,
-              'murmur_case':output[1],
+              'disease':disease,
               'murmur':output[2],
               'normal_count': normal_count,
               'abnormal_count': abnormal_count,
@@ -411,10 +434,37 @@ def update():
     resp = {"id":result[0],"mumur":result[1]}
     return jsonify(resp)
 
-# @app.route('/matlab')
-# def run():
-#     result = engine.eval('disp("Hello, world!")')
-#     return jsonify(result)
+@app.route('/add', methods=['POST'])
+def add():
+    if request.get_json():
+        data = request.get_json()
+        patient_id = data['inserted_patient_id']
+        patient_name = data['inserted_patient_name']
+        doctor_name = data['inserted_doctor_name']
+        best_heard = data['inserted_best_heard']
+
+        mydb = mysql.connector.connect(
+            host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
+            user="admin",
+            password="admin123",
+            database="demodb"
+            )
+        mycursor = mydb.cursor()
+        
+        query1 = "INSERT INTO patient_details (patient_id, patient_name, doctor_name, best_heard) VALUES (%s, %s, %s, %s)"
+        data = (patient_id,patient_name,doctor_name,best_heard)
+        print("add patient")
+        mycursor.execute(query1, data)
+        # commit the transaction
+        mydb.commit()
+        mycursor.close()
+        mydb.close()
+        return jsonify({'success': 'Successfully added patient'}), 200
+
+    else:   
+        return jsonify({'error': 'Invalid request data.'}), 400
+    
+    
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0')
