@@ -47,7 +47,7 @@
     function recievepcg() {
     var patient_id = document.getElementById("pcg-search").value;
     console.log(patient_id);
-    fetch('http://127.0.0.1:5000/render_audio', {
+    fetch('http://13.53.160.167:5000/render_audio', {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
