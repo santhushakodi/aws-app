@@ -153,7 +153,15 @@ timing_model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
     )
 ########################################Normal Abnormal##############################################
-normal_abnormal_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+# Add additional layers for classification
+input_layer1 = tf.keras.layers.Input(shape=(None,), dtype=tf.float32)
+features1 = base_model(input_layer1).last_hidden_state
+pooled_features1 = tf.keras.layers.GlobalMaxPooling1D()(features1)
+dense_layer2 = tf.keras.layers.Dense(10, activation=keras.layers.LeakyReLU(alpha=0.01))(pooled_features1)
+output_layer1 = tf.keras.layers.Dense(2, activation='softmax')(dense_layer2)
+
+# Create the model
+normal_abnormal_model = tf.keras.Model(inputs=input_layer1, outputs=output_layer1)
 normal_abnormal_model.load_weights('p_5.h5')
 normal_abnormal_model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
