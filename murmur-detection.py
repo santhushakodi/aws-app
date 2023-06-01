@@ -544,10 +544,10 @@ def upload():
     if request.files:
         pid = request.headers.get('patient_id')
         print(pid)
-        av = request.files['AV']
-        pv = request.files['PV']
-        tv = request.files['TV']
-        mv = request.files['MV']
+        av = request.files['AV'].read()
+        pv = request.files['PV'].read()
+        tv = request.files['TV'].read()
+        mv = request.files['MV'].read()
         
         mydb = mysql.connector.connect(
             host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
