@@ -557,7 +557,7 @@ def upload():
             )
         mycursor = mydb.cursor()
         
-        query13 = "INSERT INTO pcg_table (patient_id, pcg_signal) VALUES (%s, %s, %s, %s, %s)"
+        query13 = "INSERT INTO pcg_table (patient_id, AV, PV, TV, MV) VALUES (%s, %s, %s, %s, %s)"
         data = (pid,av,pv,tv,mv)
         mycursor.execute(query13, data)
         # commit the transaction
