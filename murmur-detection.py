@@ -258,6 +258,7 @@ def predict():
     normal_abnormal_input.append(preprocess_wav(mv_signal,sampling_rate))
 
     normal_abnormal_input = flatten(normal_abnormal_input)
+    print(np.shape(np.array(normal_abnormal_input)))
     outcome = normal_abnormal_model.predict(np.array(normal_abnormal_input))
     normal_abnormal_dictionary = {0: "Abnormal", 1: "Normal"}
     clinical_outcome = normal_abnormal_dictionary[np.argmax(outcome)]
