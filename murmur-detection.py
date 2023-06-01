@@ -7,6 +7,7 @@ import io
 import json
 
 import tensorflow as tf
+import tensorflow_io as tfio
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
@@ -93,9 +94,30 @@ def predict_disease(best_heard, timing, pitch, shape):
     if best_heard=="TV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
         disease = "VSD"
     return disease
-    
-    
 
+###########Normal abnormal############################################################
+def truncate_resample_and_pad_wav1(audio_data, sample_rate, max_length, target_sample_rate):
+
+    # Resample the audio data
+    audio_data_resampled = resample(audio_data, int(len(audio_data) * target_sample_rate / sample_rate))
+
+    # Truncate or pad the resampled audio data
+    if len(audio_data_resampled) > max_length:
+        audio_data_resampled = audio_data_resampled[:max_length]
+    elif len(audio_data_resampled) < max_length:
+        padding = np.zeros(max_length - len(audio_data_resampled), dtype=np.int16)
+        audio_data_resampled = np.concatenate((audio_data_resampled, padding))
+
+    return target_sample_rate, audio_data_resampled
+
+def preprocess_wav(audio_data,samplerate):
+    standarized_audio = (audio_data - np.mean(audio_data))/np.std(audio_data)
+    _,truncated = truncate_resample_and_pad_wav1(standarized_audio, sample_rate=samplerate, max_length=50000, target_sample_rate=samplerate)
+    return truncated
+
+def flatten(l):
+    return [item for sublist in l for item in sublist]
+    
     
 ################# Murmur pitch transformer model ###########
 model_name = "facebook/wav2vec2-base-960h"  # Replace with the desired pre-trained Wav2Vec2 model
@@ -130,7 +152,14 @@ timing_model.load_weights('timing.h5')
 timing_model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
     )
-######################################################################################################
+########################################Normal Abnormal##############################################
+normal_abnormal_model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+normal_abnormal_model.load_weights('p_5.h5')
+normal_abnormal_model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
+    )
+
+##################################################################################################
 
 app = Flask(__name__)
 app.secret_key = 'vortex123'
@@ -173,53 +202,58 @@ def predict():
     # Convert the received list back to a NumPy array
     audio_ = np.array(data_list)
     # Load the model from the h5 file
-    model = keras.models.load_model('outcome.h5')
-    # wavfile.write('heart.wav', sampling_rate, audio_)
+    # model = keras.models.load_model('outcome.h5')
+    # audio_slice = audio_[500:20500]
+    # filtered_audio = butter_bandpass_filt(audio_slice, 20, 600, sampling_rate ,order=12)
 
-    # with open('heart.wav', 'rb') as file:
-    #     binary_data = file.read()
+    # array = filtered_audio / np.max(filtered_audio)
+
+    # coeffs = pywt.wavedec(array,wavelet='db4',level=4)
+
+    # coeffs_arr , coeffs_slices = pywt.coeffs_to_array(coeffs)
+
+    # MAD = scipy.stats.median_abs_deviation(coeffs_arr)
+    # sigma = MAD/0.6745
+    # N = len(audio_slice)
+    # Threshold_ = sigma * ((2*np.log(N))**0.5)
+
+    # X = pywt.threshold(coeffs_arr, Threshold_, 'garrote')
+    # coeffs_filt = pywt.array_to_coeffs(X,coeffs_slices,output_format='wavedec')
+    # audio_sample = pywt.waverec(coeffs_filt,wavelet='db4')
+
+    # standarized_audio = (audio_sample - np.mean(audio_sample))/np.std(audio_sample)
+
+    # tensor1 = tf.convert_to_tensor(standarized_audio)
+
+    # spectrogram = get_spectrogram(tensor1)
+    # fig, ax = plt.subplots()
+    # plot_spectrogram('test.png',spectrogram.numpy(), ax, 'Spectrogram')  
     
-    audio_slice = audio_[500:20500]
-    
-    filtered_audio = butter_bandpass_filt(audio_slice, 20, 600, sampling_rate ,order=12)
+    # # Opens a image in RGB mode
+    # img = cv2.imread(r'test.png')
+    # resized_image = cv2.resize(img, (432,288))
+    # preprocessed_image = np.expand_dims(resized_image, axis=0) 
+    # result = model.predict(preprocessed_image)
+    # print(result)
+    # output = result.tolist()
 
-    array = filtered_audio / np.max(filtered_audio)
+    # if result[0][0] >= 0.5:
+    #     outcome = "abnormal"
+    # else:
+    #     outcome = "normal"
 
-    coeffs = pywt.wavedec(array,wavelet='db4',level=4)
+    ##############normal abnormal##############################
+    normal_abnormal_input = []
+    normal_abnormal_input.append(preprocess_wav(av_signal,sampling_rate))
+    normal_abnormal_input.append(preprocess_wav(pv_signal,sampling_rate))
+    normal_abnormal_input.append(preprocess_wav(tv_signal,sampling_rate))
+    normal_abnormal_input.append(preprocess_wav(mv_signal,sampling_rate))
 
-    coeffs_arr , coeffs_slices = pywt.coeffs_to_array(coeffs)
-
-    MAD = scipy.stats.median_abs_deviation(coeffs_arr)
-    sigma = MAD/0.6745
-    N = len(audio_slice)
-    Threshold_ = sigma * ((2*np.log(N))**0.5)
-
-    X = pywt.threshold(coeffs_arr, Threshold_, 'garrote')
-    coeffs_filt = pywt.array_to_coeffs(X,coeffs_slices,output_format='wavedec')
-    audio_sample = pywt.waverec(coeffs_filt,wavelet='db4')
-
-    standarized_audio = (audio_sample - np.mean(audio_sample))/np.std(audio_sample)
-
-    tensor1 = tf.convert_to_tensor(standarized_audio)
-
-    spectrogram = get_spectrogram(tensor1)
-    fig, ax = plt.subplots()
-    plot_spectrogram('test.png',spectrogram.numpy(), ax, 'Spectrogram')  
-    
-    # Opens a image in RGB mode
-    img = cv2.imread(r'test.png')
-    resized_image = cv2.resize(img, (432,288))
-    preprocessed_image = np.expand_dims(resized_image, axis=0) 
-    result = model.predict(preprocessed_image)
-    print(result)
-    output = result.tolist()
-
-    if result[0][0] >= 0.5:
-        outcome = "abnormal"
-    else:
-        outcome = "normal"
-
-
+    normal_abnormal_input = flatten(normal_abnormal_input)
+    outcome = normal_abnormal_model.predict(np.array(normal_abnormal_input))
+    normal_abnormal_dictionary = {0: "Abnormal", 1: "Normal"}
+    clinical_outcome = normal_abnormal_dictionary[np.argmax(outcome)]
+    print("clinical outcome : ",clinical_outcome)
     ########################################################################
     max_length = 50000
     target_sample_rate = 4000
@@ -261,7 +295,7 @@ def predict():
     # query1 = "INSERT INTO newpatients (id, murmur) VALUES (%s, %s)"
     # data = (patient_id, outcome)
     query1 = "INSERT INTO patients (patient_id, murmur_case, clinical_outcome, murmur_timing, murmur_pitch, murmur_shape) VALUES (%s, %s,%s, %s, %s, %s)"
-    data = (patient_id, murmur_case ,outcome, murmur_timing, murmur_pitch, murmur_shape)
+    data = (patient_id, murmur_case ,clinical_outcome, murmur_timing, murmur_pitch, murmur_shape)
     # print(data)
     mycursor.execute(query1, data)
     # commit the transaction
