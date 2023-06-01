@@ -1,8 +1,10 @@
 import numpy as np
-from flask import Flask, jsonify, request, redirect, session
+from flask import Flask, jsonify, request, redirect, session, send_file
 import pickle
 from flask import Flask, render_template
 import mysql.connector
+import io
+import json
 
 import tensorflow as tf
 import numpy as np
@@ -144,11 +146,17 @@ def dashboard():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if 'data' in request.json and 'sampling_rate' in request.json:
-        data_list = request.json['data']
-        sampling_rate = request.json['sampling_rate']
-        patient_id = request.json['patient_id']
-        murmur_case = request.json['murmur_case']
+    data = request.get_json()
+    if data:
+        data_list = data['data']
+        sampling_rate = data['sampling_rate']
+        patient_id = data['patient_id']
+        murmur_case = data['murmur_case']
+        av_signal = data['AV']
+        pv_signal = data['PV']
+        tv_signal = data['TV']
+        mv_signal = data['MV']
+        print("success")
     # print(request.json['patient_id'])
     # if 'wav_file' in request.files:
     #     file = request.files['wav_file']
@@ -166,10 +174,10 @@ def predict():
     audio_ = np.array(data_list)
     # Load the model from the h5 file
     model = keras.models.load_model('outcome.h5')
-    wavfile.write('heart.wav', sampling_rate, audio_)
+    # wavfile.write('heart.wav', sampling_rate, audio_)
 
-    with open('heart.wav', 'rb') as file:
-        binary_data = file.read()
+    # with open('heart.wav', 'rb') as file:
+    #     binary_data = file.read()
     
     audio_slice = audio_[500:20500]
     
@@ -252,8 +260,8 @@ def predict():
     # patient_id= int(patient_id)
     # query1 = "INSERT INTO newpatients (id, murmur) VALUES (%s, %s)"
     # data = (patient_id, outcome)
-    query1 = "INSERT INTO patients (patient_id, murmur_case, clinical_outcome, murmur_timing, murmur_pitch, murmur_shape, pcg_signal) VALUES (%s, %s,%s, %s, %s, %s,%s)"
-    data = (patient_id, murmur_case ,outcome, murmur_timing, murmur_pitch, murmur_shape, binary_data)
+    query1 = "INSERT INTO patients (patient_id, murmur_case, clinical_outcome, murmur_timing, murmur_pitch, murmur_shape) VALUES (%s, %s,%s, %s, %s, %s)"
+    data = (patient_id, murmur_case ,outcome, murmur_timing, murmur_pitch, murmur_shape)
     # print(data)
     mycursor.execute(query1, data)
     # commit the transaction
@@ -330,14 +338,25 @@ def murmur_show():
     mycursor.execute(query12, data12)
     # fetch the result
     detail = mycursor.fetchone()
-    mycursor.close()
-    mydb.close()
-
+    print("detail :" ,detail)
     if detail:
         disease = predict_disease(detail[3],output[3],output[4],output[5])
     else:
         disease = ""
     print(disease)
+
+
+    # query13 = "select * from pcg_table where patient_id=%s"
+    # data13 = (pid,)
+    # mycursor.execute(query13, data13)
+    # # commit the transaction
+    # detail = mycursor.fetchone()
+    # encoded_wav = base64.b64encode(detail[1]).decode('utf-8')
+    # print(type(encoded_wav))
+    mycursor.close()
+    mydb.close()
+
+    username = session.get('username')
     
     # result = {'message': 'Data processed successfully',
     #           'pid':pid,
@@ -358,14 +377,19 @@ def murmur_show():
               'mid_systolic_count':mid_systolic_count,
               'decrescendo_count': decrescendo_count,
               'diamond_count':diamond_count,
-              'plateau_count':plateau_count
+              'plateau_count':plateau_count,
+              'name': username
               }
     # print(result)
     if output[1] == "Absent":
         result['murmur_pitch'] = ""
         result['murmur_shape'] = ""
         result['murmur_timing'] = ""
+    
+    
+    # return render_template("index.html", wav_data = encoded_wav)
     return jsonify(result)
+                           
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -396,6 +420,7 @@ def login():
 
         if user and password == user[3]:
             session['email'] = email
+            session['username'] = data["name"]
             # return redirect('/dashboard')
             return render_template('index.html', data=data)
         else:
@@ -468,7 +493,92 @@ def add():
     else:   
         return jsonify({'error': 'Invalid request data.'}), 400
     
+@app.route('/upload', methods=['POST'])
+def upload():
+    # print("headers:",request.headers)
+    if request.files:
+        pid = request.headers.get('patient_id')
+        print(pid)
+        av = request.files['AV']
+        pv = request.files['PV']
+        tv = request.files['TV']
+        mv = request.files['MV']
+        
+        mydb = mysql.connector.connect(
+            host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
+            user="admin",
+            password="admin123",
+            database="demodb"
+            )
+        mycursor = mydb.cursor()
+        
+        query13 = "INSERT INTO pcg_table (patient_id, pcg_signal) VALUES (%s, %s, %s, %s, %s)"
+        data = (pid,av,pv,tv,mv)
+        mycursor.execute(query13, data)
+        # commit the transaction
+        mydb.commit()
+        mycursor.close()
+        mydb.close()
+        return jsonify({'success': 'Successfully added patient'}), 200
+    else:
+        return jsonify({'failed': 'failed'}), 400
+
+@app.route('/render_audio', methods=['GET','POST'])
+def render_audio():
+    if request.method == 'GET':
+        mydb = mysql.connector.connect(
+                host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
+                user="admin",
+                password="admin123",
+                database="demodb"
+                )
+        mycursor = mydb.cursor()
+        
+        query13 = "select * from pcg_table where patient_id=%s"
+        data = ("202305311158",)
+        mycursor.execute(query13, data)
+        # commit the transaction
+        detail = mycursor.fetchone()
+        mycursor.close()
+        mydb.close()
+        encoded_wav = base64.b64encode(detail[1]).decode('utf-8')
+        print(type(encoded_wav))
+        print(encoded_wav[:50])
+        return render_template("temp.html", wav_data=encoded_wav)
+    
+    else:
+        data = request.get_json()
+        patient_id = data["patient_id"]
+        print("patient_id : ",patient_id)
+        mydb = mysql.connector.connect(
+                host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
+                user="admin",
+                password="admin123",
+                database="demodb"
+                )
+        mycursor = mydb.cursor()
+        
+        query13 = "select * from pcg_table where patient_id=%s"
+        data = (patient_id,)
+        mycursor.execute(query13, data)
+        # commit the transaction
+        detail = mycursor.fetchone()
+        mycursor.close()
+        mydb.close()
+        encoded_wav = ""
+        encoded_wav = base64.b64encode(detail[1]).decode('utf-8')
+        print(type(encoded_wav))
+        print(encoded_wav[:50])
+        return render_template("temp.html", wav_data=encoded_wav)
+        # return jsonify({"wav":encoded_wav})
+    
+    # with open('43852_MV.wav', 'rb') as wav_data:
+    #     encoded_wav = base64.b64encode(wav_data.read()).decode('utf-8')
+    #     return render_template("temp.html", wav_data=encoded_wav)
+
+
     
 
+
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')

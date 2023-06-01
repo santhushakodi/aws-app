@@ -1,0 +1,60 @@
+<!-- <audio controls>
+    <source id="audio-source" type="audio/wav" src="data:audio/wav;base64,{{ wav_data }}">
+    Your browser does not support the audio element.
+    <p>{{ wav_data }}</p>
+</audio>
+
+<script>
+    var encodedWav = "{{ wav_data }}";
+    // Print the encoded WAV data in the console
+    console.log(encodedWav);
+    var audioSource1 = document.getElementById("audio-source");
+    console.log("This is src:"+audioSource1.src);
+</script> -->
+
+<input type="text" id="pcg-search" placeholder="Search . . .">	
+<button type="submit" onclick="recievepcg()">Submit</button>
+
+<audio controls>
+    <source id="audio-source" type="audio/wav" src="data:audio/wav;base64,{{ wav_data }}">
+    Your browser does not support the audio element.
+</audio>
+
+<script>
+    // var audioSource1 = document.getElementById("audio-source");
+    // console.log("This is src:"+audioSource1.src);
+    // async function recievepcg(){
+	// 		try{
+	// 			var patient_id = document.getElementById("pcg-search").value;
+	// 			console.log(patient_id);
+	// 			const response = await fetch('http://127.0.0.1:5000/render_audio', {
+	// 				method: "POST",
+	// 				headers: {
+	// 				'Content-Type': 'application/json'
+	// 				},
+	// 				body: JSON.stringify({"patient_id": patient_id})
+										  
+	// 			});
+    //     		const data = await response.json();
+				
+	// 		}
+	// 		catch(error){
+	// 			console.log(error);
+	// 		}
+	// 	}
+
+
+    function recievepcg() {
+    var patient_id = document.getElementById("pcg-search").value;
+    console.log(patient_id);
+    fetch('http://127.0.0.1:5000/render_audio', {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"patient_id": patient_id})
+        });
+        }
+</script>
+
+
