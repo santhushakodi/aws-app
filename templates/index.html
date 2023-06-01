@@ -92,7 +92,7 @@
 				var best_heard = document.getElementById("best_heard_location").value;
 				
 				console.log(patient_id, patient_name, doctor_name, best_heard);
-				const response = await fetch('http://13.53.160.167/add', {
+				const response = await fetch('http://13.53.160.167:5000/add', {
 					method: "POST",
 					headers: {
 					'Content-Type': 'application/json'
@@ -960,7 +960,7 @@
 											<!-- The form -->
 											<div class="form-popup" id="myForm">
 												<div class="form-container">
-												<h1>Login</h1>
+												<h1>Add patient</h1>
 											
 												<!-- <label for="email"><b>Email</b></label> -->
 												<input type="text" placeholder="patient id" id="patient_id" required>
