@@ -321,7 +321,8 @@ def murmur_show():
     data = request.get_json()
     pid = data['patient_id']
     print("patient id :", pid)
-
+    doctor_name = session.get('username')
+    print("session name : ", session.get('username'))
     # Process the data as required
     mydb = mysql.connector.connect(
         host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
@@ -350,8 +351,8 @@ def murmur_show():
         # Fetch the result
     abnormal_count = mycursor.fetchone()[0]
 
-    query5 = "SELECT COUNT(*) FROM patients"
-    mycursor.execute(query5)
+    query5 = "SELECT COUNT(*) FROM patient_details WHERE doctor_name = %s"
+    mycursor.execute(query5,(doctor_name,))
     total_patients = mycursor.fetchone()[0]
 
     query6 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
@@ -390,23 +391,60 @@ def murmur_show():
         disease = ""
     print(disease)
 
+    query13 = "select patient_id from patient_details where doctor_name=%s"
+    data13 = (doctor_name,)
+    mycursor.execute(query13, data13)
+    rows = mycursor.fetchall()
+    patient_ids = [row[0] for row in rows]
 
-    # query13 = "select * from pcg_table where patient_id=%s"
-    # data13 = (pid,)
-    # mycursor.execute(query13, data13)
-    # # commit the transaction
-    # detail = mycursor.fetchone()
-    # encoded_wav = base64.b64encode(detail[1]).decode('utf-8')
-    # print(type(encoded_wav))
+     # Replace with your actual list of IDs
+
+    # Convert the list of IDs to a comma-separated string
+    id_string = ','.join(patient_ids)
+
+    # Execute the query to retrieve the desired column and count
+    query14 = f"SELECT clinical_outcome, COUNT(*) FROM patients WHERE patient_id IN ({id_string}) GROUP BY clinical_outcome"
+    mycursor.execute(query14)
+    clinical_rows = mycursor.fetchall()
+
+    query15 = f"SELECT murmur_timing, COUNT(*) FROM patients WHERE patient_id IN ({id_string}) GROUP BY murmur_timing"
+    mycursor.execute(query15)
+    timing_rows = mycursor.fetchall()
+
+    query16 = f"SELECT murmur_shape, COUNT(*) FROM patients WHERE patient_id IN ({id_string}) GROUP BY murmur_shape"
+    mycursor.execute(query16)
+    shape_rows = mycursor.fetchall()
+
     mycursor.close()
     mydb.close()
 
     username = session.get('username')
     
-    # result = {'message': 'Data processed successfully',
-    #           'pid':pid,
-    #           'murmur':murmur}
-    # wave = base64.b64encode(output[6]).decode('utf-8')
+    clinical_result = {}
+    for row in clinical_rows:
+        column_value = row[0]
+        count = row[1]
+        clinical_result[column_value] = count
+    print(clinical_result)
+    normal_count = clinical_result.get("normal",0)
+    abnormal_count = clinical_result.get("abnormal",0)
+
+    timing_result = {}
+    for row in timing_rows:
+        timing_result[row[0]] = row[1]
+    print(timing_result)
+    early_systolic_count = timing_result.get("early systolic",0)
+    holo_systolic_count = timing_result.get("holo systolic",0)
+    mid_systolic_count = timing_result.get("mid systolic",0)
+
+    shape_result = {}
+    for row in shape_rows:
+        shape_result[row[0]] = row[1]
+    print(shape_result)
+    decrescendo_count = shape_result.get('Decrescendo',0)
+    diamond_count = shape_result.get('Diamond',0)
+    plateau_count = shape_result.get('Plateau',0)
+
     result = {'message':'data processed successfully',
               'pid':pid,
               'disease':disease,
