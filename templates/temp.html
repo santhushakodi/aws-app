@@ -1,24 +1,162 @@
-<!-- <audio controls>
-    <source id="audio-source" type="audio/wav" src="data:audio/wav;base64,{{ wav_data }}">
-    Your browser does not support the audio element.
-    <p>{{ wav_data }}</p>
-</audio>
+<!DOCTYPE html>
+<html lang="en">
 
-<script>
-    var encodedWav = "{{ wav_data }}";
-    // Print the encoded WAV data in the console
-    console.log(encodedWav);
-    var audioSource1 = document.getElementById("audio-source");
-    console.log("This is src:"+audioSource1.src);
-</script> -->
+<head>
 
-<input type="text" id="pcg-search" placeholder="Search . . .">	
-<button type="submit" onclick="recievepcg()">Submit</button>
+	<title>Vortex app</title>
+	<!-- HTML5 Shim and Respond.js IE11 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 11]>
+		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+	<!-- Meta -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="description" content="Flash Able Bootstrap admin template made using Bootstrap 4 and it has huge amount of ready made feature, UI components, pages which completely fulfills any dashboard needs." />
+	<meta name="keywords"
+		content="admin templates, bootstrap admin templates, bootstrap 4, dashboard, dashboard templets, sass admin templets, html admin templates, responsive, bootstrap admin templates free download,premium bootstrap admin templates, Flash Able, Flash Able bootstrap admin template">
+	<meta name="author" content="Codedthemes" />
 
-<audio controls>
-    <source id="audio-source" type="audio/wav" src="data:audio/wav;base64,{{ wav_data }}">
-    Your browser does not support the audio element.
-</audio>
+	<!-- Favicon icon -->
+	<link rel="icon" href="../static/images/favicon.ico" type="image/x-icon">
+	<!-- fontawesome icon -->
+	<link rel="stylesheet" href="../static/fonts/fontawesome/css/fontawesome-all.min.css">
+	<!-- animation css -->
+	<link rel="stylesheet" href="../static/plugins/animation/css/animate.min.css">
+
+	<!-- vendor css -->
+	<link rel="stylesheet" href="../static/css/style.css">
+</head>
+
+
+
+<!-- <div class="nav2">
+    <div class="col-xl-9 col-md-6">
+        <form action="/render_audio" method="GET">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" name="query" class="form-control" placeholder="Search..." />
+                    <div class="input-group-append">
+                        <input type="submit" class="input-group-append search-btn btn btn-primary" value="Search" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="home-button">
+        <form action="/home" method="GET">
+            <input type="submit" class="input-group-append search-btn btn btn-primary" value="Home" />
+        </form>
+    </div>
+</div> -->
+
+<div class="nav2">
+    <div class="col-xl-9 col-md-6">
+        <form action="/render_audio" method="GET">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" name="query" class="form-control" placeholder="Search..." />
+                    <div class="input-group-append">
+                        <input type="submit" class="input-group-append search-btn btn btn-primary" value="Search" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-xl-3 col-md-6 home-button">
+        <form action="/home" method="GET">
+            <input type="submit" class="input-group-append search-btn btn btn-primary" value="Home" />
+        </form>
+    </div>
+</div>
+
+
+
+
+
+<div class="row">
+    <div class="col-xl-6 col-md-6">
+        <div class="card prod-p-card bg-c-blue">
+            <div class="card-body">
+                <div class="row align-items-center m-b-25">
+                    <div class="col">
+                        <h1>AV</h1>
+                    </div>
+                    <div class="col-auto">
+                        
+                        <audio controls>
+                            <source id="audio-source1" type="audio/wav" src="data:audio/wav;base64,{{ wav_data1 }}">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                </div>
+                <!-- <p class="m-b-0 text-white"><span class="label label-primary m-r-10">+12%</span>From Previous Month</p> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-md-6">
+        <div class="card prod-p-card bg-c-red">
+            <div class="card-body">
+                <div class="row align-items-center m-b-25">
+                    <div class="col">
+                        <h1>PV</h1>
+                    </div>
+                    <div class="col-auto">
+                        <audio controls>
+                            <source id="audio-source1" type="audio/wav" src="data:audio/wav;base64,{{ wav_data1 }}">
+                            Your browser does not support the audio element.
+                        </audio> 
+                    </div>
+                </div>
+                <!-- <p class="m-b-0 text-white"><span class="label label-primary m-r-10">+12%</span>From Previous Month</p> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-md-6">
+        <div class="card prod-p-card bg-c-green">
+            <div class="card-body">
+                <div class="row align-items-center m-b-25">
+                    <div class="col">
+                        <h1>TV</h1>
+                    </div>
+                    <div class="col-auto">
+                        <audio controls>
+                            <source id="audio-source1" type="audio/wav" src="data:audio/wav;base64,{{ wav_data1 }}">
+                            Your browser does not support the audio element.
+                        </audio>
+                        
+                    </div>
+                </div>
+                <!-- <p class="m-b-0 text-white"><span class="label label-primary m-r-10">+12%</span>From Previous Month</p> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-md-6">
+        <div class="card prod-p-card bg-c-yellow">
+            <div class="card-body">
+                <div class="row align-items-center m-b-25">
+                    <div class="col">
+                        <h1>MV</h1>
+                    </div>
+                    <div class="col-auto">
+                        <audio controls>
+                            <source id="audio-source1" type="audio/wav" src="data:audio/wav;base64,{{ wav_data1 }}">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                </div>
+                <!-- <p class="m-b-0 text-white"><span class="label label-primary m-r-10">+12%</span>From Previous Month</p> -->
+            </div>
+        </div>
+    </div>
+</div> 
+
+
 
 <script>
     // var audioSource1 = document.getElementById("audio-source");
@@ -47,7 +185,7 @@
     function recievepcg() {
     var patient_id = document.getElementById("pcg-search").value;
     console.log(patient_id);
-    fetch('http://13.53.160.167:5000/render_audio', {
+    fetch('http://127.0.0.1:5000/render_audio', {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

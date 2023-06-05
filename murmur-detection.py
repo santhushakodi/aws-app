@@ -87,12 +87,14 @@ def predict_disease(best_heard, timing, pitch, shape):
     disease = ""
     if best_heard=="MV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
         disease = "MR"
-    if best_heard=="AV" and timing == "mid systolic" and shape == "Diamond":
+    elif best_heard=="AV" and timing == "mid systolic" and shape == "Diamond":
         disease = "AS"
-    if best_heard=="PV" and timing == "mid systolic" and pitch == "High" and shape == "Diamond":
+    elif best_heard=="PV" and timing == "mid systolic" and pitch == "High" and shape == "Diamond":
         disease = "ASD"
-    if best_heard=="TV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
+    elif best_heard=="TV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
         disease = "VSD"
+    elif timing == "mid systolic" and shape == "Diamond":
+        disease = "AS\ASD"    
     return disease
 
 ###########Normal abnormal############################################################
@@ -608,60 +610,49 @@ def upload():
 
 @app.route('/render_audio', methods=['GET','POST'])
 def render_audio():
-    if request.method == 'GET':
+    print(request.method)
+    id = request.args.get('query')
+    print(id)
+    if id:
         mydb = mysql.connector.connect(
-                host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
-                user="admin",
-                password="admin123",
-                database="demodb"
-                )
+                    host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
+                    user="admin",
+                    password="admin123",
+                    database="demodb"
+                    )
         mycursor = mydb.cursor()
         
         query13 = "select * from pcg_table where patient_id=%s"
-        data = ("202305311158",)
+        data = (id,)
         mycursor.execute(query13, data)
         # commit the transaction
         detail = mycursor.fetchone()
         mycursor.close()
         mydb.close()
-        encoded_wav = base64.b64encode(detail[1]).decode('utf-8')
-        print(type(encoded_wav))
-        print(encoded_wav[:50])
-        return render_template("temp.html", wav_data=encoded_wav)
+        encoded_wav1 = base64.b64encode(detail[1]).decode('utf-8')
+        encoded_wav2 = base64.b64encode(detail[2]).decode('utf-8')
+        encoded_wav3 = base64.b64encode(detail[3]).decode('utf-8')
+        encoded_wav4 = base64.b64encode(detail[4]).decode('utf-8')
+        print(type(encoded_wav1))
+        return render_template("temp.html", 
+                                wav_data1=encoded_wav1,
+                                wav_data2=encoded_wav2,
+                                wav_data3=encoded_wav3,
+                                wav_data4=encoded_wav4)
     
     else:
-        data = request.get_json()
-        patient_id = data["patient_id"]
-        print("patient_id : ",patient_id)
-        mydb = mysql.connector.connect(
-                host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
-                user="admin",
-                password="admin123",
-                database="demodb"
-                )
-        mycursor = mydb.cursor()
-        
-        query13 = "select * from pcg_table where patient_id=%s"
-        data = (patient_id,)
-        mycursor.execute(query13, data)
-        # commit the transaction
-        detail = mycursor.fetchone()
-        mycursor.close()
-        mydb.close()
-        encoded_wav = ""
-        encoded_wav = base64.b64encode(detail[1]).decode('utf-8')
-        print(type(encoded_wav))
-        print(encoded_wav[:50])
-        return render_template("temp.html", wav_data=encoded_wav)
-        # return jsonify({"wav":encoded_wav})
-    
-    # with open('43852_MV.wav', 'rb') as wav_data:
-    #     encoded_wav = base64.b64encode(wav_data.read()).decode('utf-8')
-    #     return render_template("temp.html", wav_data=encoded_wav)
+        print("No data")
+        return render_template("temp.html", 
+                                wav_data1="",
+                                wav_data2="",
+                                wav_data3="",
+                                wav_data4="")
 
-
-    
+@app.route('/home', methods=['GET', "POST"])
+def render_home():
+    username = session.get('username')
+    return render_template("index.html", data = {"name":username})
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')

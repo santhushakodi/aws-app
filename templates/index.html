@@ -37,7 +37,7 @@
 			try{
 				var query = document.getElementById("m-search").value;
 				console.log(query)
-				const response = await fetch('http://13.53.160.167:5000/search', {
+				const response = await fetch('http://127.0.0.1:5000/search', {
 					method: "POST",
 					headers: {
 					'Content-Type': 'application/json'
@@ -92,7 +92,7 @@
 				var best_heard = document.getElementById("best_heard_location").value;
 				
 				console.log(patient_id, patient_name, doctor_name, best_heard);
-				const response = await fetch('http://13.53.160.167:5000/add', {
+				const response = await fetch('http://127.0.0.1:5000/add', {
 					method: "POST",
 					headers: {
 					'Content-Type': 'application/json'
@@ -950,12 +950,18 @@
 											</div> -->
 											<!-- <p class="m-t-15">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p> -->
 											<hr>
-											<!-- <div class="row justify-content-center user-social-link">
-												<div class="col-auto"><a href="#!"><i class="fab fa-facebook-f text-primary f-22"></i></a></div>
+											<div class="row justify-content-center user-social-link">
+												<!-- <div class="col-auto"><a href="#!"><i class="fab fa-facebook-f text-primary f-22"></i></a></div>
 												<div class="col-auto"><a href="#!"><i class="fab fa-twitter text-c-info f-22"></i></a></div>
-												<div class="col-auto"><a href="#!"><i class="fab fa-dribbble text-c-red f-22"></i></a></div>
-											</div> -->
-											<button class="open-button" onclick="openForm()">Add patient</button>
+												<div class="col-auto"><a href="#!"><i class="fab fa-dribbble text-c-red f-22"></i></a></div> -->
+												<form action="/render_audio" method="GET">
+													<input type="submit" class="input-group-append search-btn btn btn-primary" value="Recordings" />
+												</form>
+												<button class="input-group-append search-btn btn btn-primary" onclick="openForm()">Add patient</button>
+											</div>
+											<!-- <button class="open-button" onclick="openForm()">Add patient</button> -->
+
+											
 
 											<!-- The form -->
 											<div class="form-popup" id="myForm">
@@ -971,27 +977,30 @@
 											
 												<button type="submit" class="btn" onclick="patientadd()">Add</button>
 												<button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+
+						
 												</div>
 											</div>
 										</div>
 									</div>
-									<div>
-										<!-- <h1>WAV File</h1>
-										<audio controls>
-											<source id="audio-source" type="audio/wav" src="data:audio/wav;base64,{{ wav_data }}">
-											Your browser does not support the audio element.
-										</audio> -->
-										<!-- <input type="text" id="patient-search" class="form-control" placeholder="Patient name">
-										<button class="input-group-append search-btn btn btn-primary" onclick="getid()">
-											<i class="feather icon-search input-group-text"></i>
-										</button> -->
-
-									</div>
+									
 								</div>
 								
 							</div>
 
 							<!-- [ Main Content ] end -->
+
+							<!-- <div>
+								<h1>WAV File</h1>
+								<audio controls>
+									<source id="audio-source" type="audio/wav" src="data:audio/wav;base64,{{ wav_data }}">
+									Your browser does not support the audio element.
+								</audio>
+								<input type="text" id="patient-search" class="form-control" placeholder="Patient name">
+								<button class="input-group-append search-btn btn btn-primary">
+									<i class="feather icon-search input-group-text"></i>
+								</button>
+							</div> -->
 						</div>
 					</div>
 				</div>
