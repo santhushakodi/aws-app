@@ -84,17 +84,52 @@ def truncate_resample_and_pad_wav(audio_data, sample_rate, max_length, target_sa
     return target_sample_rate, audio_data_resampled
 
 def predict_disease(best_heard, timing, pitch, shape):
-    disease = ""
-    if best_heard=="MV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
-        disease = "MR"
-    elif best_heard=="AV" and timing == "mid systolic" and shape == "Diamond":
-        disease = "AS"
-    elif best_heard=="PV" and timing == "mid systolic" and pitch == "High" and shape == "Diamond":
-        disease = "ASD"
-    elif best_heard=="TV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
-        disease = "VSD"
-    elif timing == "mid systolic" and shape == "Diamond":
-        disease = "AS\ASD"    
+    timing_disease, pitch_disease, shape_disease, disease = "","","",""
+    if timing == "Holo Systolic" and best_heard == None:
+        timing_disease = "Mitral Regurgitation and Ventricular Septal Defect are possible based on murmur timing."
+    elif timing == "Mid Systolic" and best_heard == None:
+        timing_disease = "Aortic Stenosis and Atrial Septal Defect are possible based on murmur timing."
+    elif timing == "Holo Systolic" and best_heard == "MV":
+        timing_disease = "Mitral Regurgitation is possible based on murmur timing."
+    elif timing == "Holo Systolic" and best_heard == "TV":
+        timing_disease = "Ventricular Septal Defect is possible based on murmur timing."
+    elif timing == "Mid Systolic" and best_heard == "AV":
+        timing_disease = "Aortic Stenosis is possible based on murmur timing."
+    elif timing == "Mid Systolic" and best_heard == "PV":
+        timing_disease = "Atrial Septal Defect are possible based on murmur timing."
+    
+    if shape == "Plateau" and best_heard == None:
+        shape_disease = "Mitral Regurgitation and Ventricular Septal Defect are possible based on murmur shape."
+    elif shape == "Diamond" and best_heard == None:
+        shape_disease = "Aortic Stenosis and Atrial Septal Defect are possible based on murmur shape."
+    elif shape == "Plateau" and best_heard == "MV":
+        shape_disease = "Mitral Regurgitation is possible based on murmur shape."
+    elif shape == "Plateau" and best_heard == "TV":
+        shape_disease = "Ventricular Septal Defect is possible based on murmur shape."
+    elif shape == "Diamond" and best_heard == "AV":
+        shape_disease = "Aortic Stenosis is possible based on murmur shape."
+    elif shape == "Diamond" and best_heard == "PV":
+        shape_disease = "Atrial Septal Defect is possible based on murmur shape."
+
+    
+    if pitch == "High" and best_heard == None:
+        pitch_disease = "Mitral Regurgitation, Atrial Septal Defect and Ventricular Septal Defect are possible based on murmur pitch."
+    elif pitch == "High" and best_heard == "MV":
+        pitch_disease = "Mitral Regurgitation is possible based on murmur pitch."
+    if pitch == "High" and best_heard == "PV":
+        pitch_disease = "Atrial Septal Defect is possible based on murmur pitch."
+    if pitch == "High" and best_heard == "TV":
+        pitch_disease = "Ventricular Septal Defect is possible based on murmur pitch."
+    
+    disease = timing_disease + shape_disease + pitch_disease
+    # if best_heard=="MV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
+    #     disease = "MR"
+    # elif best_heard=="AV" and timing == "mid systolic" and shape == "Diamond":
+    #     disease = "AS"
+    # elif best_heard=="PV" and timing == "mid systolic" and pitch == "High" and shape == "Diamond":
+    #     disease = "ASD"
+    # elif best_heard=="TV" and timing == "holo systolic" and pitch == "High" and shape == "Plateau":
+    #     disease = "VSD"   
     return disease
 
 ###########Normal abnormal############################################################
@@ -164,7 +199,7 @@ output_layer1 = tf.keras.layers.Dense(2, activation='softmax')(dense_layer2)
 
 # Create the model
 normal_abnormal_model = tf.keras.Model(inputs=input_layer1, outputs=output_layer1)
-normal_abnormal_model.load_weights('p_5.h5')
+normal_abnormal_model.load_weights('p_7.h5')
 normal_abnormal_model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=1e-6), loss="categorical_crossentropy", metrics=[keras.metrics.Precision(), keras.metrics.Recall(), keras.metrics.SpecificityAtSensitivity(0.5), keras.metrics.SensitivityAtSpecificity(0.5), 'accuracy'],run_eagerly=True
     )
@@ -292,7 +327,7 @@ def predict():
     ############################  Murmur timing ################################################
     
     m_timing = shape_model.predict(input_data)
-    timing_dict = {0:"early systolic", 1:"holo systolic", 2:"mid systolic"}
+    timing_dict = {0:"Early Systolic", 1:"Holo Systolic", 2:"Mid Systolic"}
 
     murmur_timing = timing_dict[np.argmax(m_timing)]
     print(murmur_timing)
@@ -428,16 +463,16 @@ def murmur_show():
         count = row[1]
         clinical_result[column_value] = count
     print(clinical_result)
-    normal_count = clinical_result.get("normal",0)
-    abnormal_count = clinical_result.get("abnormal",0)
+    normal_count = clinical_result.get("Normal",0)
+    abnormal_count = clinical_result.get("Abnormal",0)
 
     timing_result = {}
     for row in timing_rows:
         timing_result[row[0]] = row[1]
     print(timing_result)
-    early_systolic_count = timing_result.get("early systolic",0)
-    holo_systolic_count = timing_result.get("holo systolic",0)
-    mid_systolic_count = timing_result.get("mid systolic",0)
+    early_systolic_count = timing_result.get("Early Systolic",0)
+    holo_systolic_count = timing_result.get("Holo Systolic",0)
+    mid_systolic_count = timing_result.get("Mid Systolic",0)
 
     shape_result = {}
     for row in shape_rows:
