@@ -426,12 +426,15 @@ def murmur_show():
     # fetch the result
     detail = mycursor.fetchone()
     print("detail :" ,detail)
-    if detail:
+
+    if detail and output:
         print(detail[3],output[3],output[4],output[5])
         disease = predict_disease(detail[3],output[3],output[4],output[5])
-    else:
+    elif output:
         print("detail None")
         disease = predict_disease("",output[3],output[4],output[5])
+    else:
+        disease = ""
     print("disease : ", disease)
 
     query13 = "select patient_id from patient_details where doctor_name=%s"
