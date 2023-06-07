@@ -380,6 +380,10 @@ def murmur_show():
     # fetch the result
     output = mycursor.fetchone()
 
+    if not output:
+        username = session.get('username')
+        return render_template("index.html", data = {"name":username})
+
     query3 = "SELECT COUNT(*) FROM patients WHERE clinical_outcome = %s"
     mycursor.execute(query3, ("normal",))
         
