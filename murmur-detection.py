@@ -84,6 +84,7 @@ def truncate_resample_and_pad_wav(audio_data, sample_rate, max_length, target_sa
     return target_sample_rate, audio_data_resampled
 
 def predict_disease(best_heard, timing, pitch, shape):
+    print("predict disease : ", best_heard,timing,pitch,shape)
     timing_disease, pitch_disease, shape_disease, disease = "","","",""
     if timing == "Holo Systolic" and best_heard == None:
         timing_disease = "Mitral Regurgitation and Ventricular Septal Defect are possible based on murmur timing."
