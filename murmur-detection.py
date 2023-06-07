@@ -503,9 +503,9 @@ def murmur_show():
     for row in pitch_rows:
         pitch_result[row[0]] = row[1]
     print(pitch_result)
-    low_pitch_count = shape_result.get('Low',0)
-    medium_pitch_count = shape_result.get('Medium',0)
-    high_pitch_count = shape_result.get('High',0)
+    low_pitch_count = pitch_result.get('Low',0)
+    medium_pitch_count = pitch_result.get('Medium',0)
+    high_pitch_count = pitch_result.get('High',0)
 
     result = {'message':'data processed successfully',
               'pid':pid,
