@@ -424,6 +424,7 @@ def murmur_show():
     print("detail :" ,detail)
     print("best_heard : ", detail[3])
     if detail:
+        print(detail[3],output[3],output[4],output[5])
         disease = predict_disease(detail[3],output[3],output[4],output[5])
     else:
         print("detail None")
