@@ -68,6 +68,10 @@
 				document.getElementById("diamond").innerHTML = data.diamond_count;
 				document.getElementById("plateau").innerHTML = data.plateau_count;
 
+				document.getElementById("low-pitch").innerHTML = data.low_pitch_count;
+				document.getElementById("medium-pitch").innerHTML = data.medium_pitch_count;
+				document.getElementById("high-pitch").innerHTML = data.high_pitch_count;
+
 
 			} catch(error){
 				console.log(error)
@@ -596,6 +600,12 @@
 																				class="feather icon-help-circle f-16"></i></a></span></th>
 																<th><span>Plateau<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
 																				class="feather icon-help-circle f-16"></i></a></span></th>
+																<th><span>Low Pitch<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+																				class="feather icon-help-circle f-16"></i></a></span></th>
+																<th><span>Medium Pitch<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+																				class="feather icon-help-circle f-16"></i></a></span></th>
+																<th><span>High Pitch<a class="help" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?"><i
+																				class="feather icon-help-circle f-16"></i></a></span></th>
 															</tr>
 														</thead>
 														<tbody>
@@ -652,6 +662,9 @@
 																		<div class="progress-bar bg-success rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
 																	</div> -->
 																</td>
+																<td id="low-pitch"></td>
+																<td id="medium-pitch"></td>
+																<td id="high-pitch"></td>
 															</tr>
 															<!-- <tr>
 																<td>Average</td>

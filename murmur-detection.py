@@ -396,29 +396,29 @@ def murmur_show():
     mycursor.execute(query5,(doctor_name,))
     total_patients = mycursor.fetchone()[0]
 
-    query6 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
-    mycursor.execute(query6,("early systolic",)) 
-    early_systolic_count = mycursor.fetchone()[0]
+    # query6 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
+    # mycursor.execute(query6,("early systolic",)) 
+    # early_systolic_count = mycursor.fetchone()[0]
 
-    query7 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
-    mycursor.execute(query7,("holo systolic",)) 
-    holo_systolic_count = mycursor.fetchone()[0]
+    # query7 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
+    # mycursor.execute(query7,("holo systolic",)) 
+    # holo_systolic_count = mycursor.fetchone()[0]
 
-    query8 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
-    mycursor.execute(query8,("mid systolic",)) 
-    mid_systolic_count = mycursor.fetchone()[0]
+    # query8 = "SELECT COUNT(*) FROM patients WHERE murmur_timing = %s"
+    # mycursor.execute(query8,("mid systolic",)) 
+    # mid_systolic_count = mycursor.fetchone()[0]
 
-    query9 = "SELECT COUNT(*) FROM patients WHERE murmur_shape= %s"
-    mycursor.execute(query9,("Decrescendo",))
-    decrescendo_count = mycursor.fetchone()[0]
+    # query9 = "SELECT COUNT(*) FROM patients WHERE murmur_shape= %s"
+    # mycursor.execute(query9,("Decrescendo",))
+    # decrescendo_count = mycursor.fetchone()[0]
 
-    query10 = "SELECT COUNT(*) FROM patients WHERE murmur_shape= %s"
-    mycursor.execute(query10,("Diamond",))
-    diamond_count = mycursor.fetchone()[0]
+    # query10 = "SELECT COUNT(*) FROM patients WHERE murmur_shape= %s"
+    # mycursor.execute(query10,("Diamond",))
+    # diamond_count = mycursor.fetchone()[0]
 
-    query11 = "SELECT COUNT(*) FROM patients WHERE murmur_shape= %s"
-    mycursor.execute(query11,("Plateau",))
-    plateau_count = mycursor.fetchone()[0]
+    # query11 = "SELECT COUNT(*) FROM patients WHERE murmur_shape= %s"
+    # mycursor.execute(query11,("Plateau",))
+    # plateau_count = mycursor.fetchone()[0]
     
     query12 = "SELECT * FROM patient_details WHERE patient_id=%s"
     data12 = (pid,)
@@ -458,6 +458,10 @@ def murmur_show():
     mycursor.execute(query16)
     shape_rows = mycursor.fetchall()
 
+    query17 = f"SELECT murmur_pitch, COUNT(*) FROM patients WHERE patient_id IN ({id_string}) GROUP BY murmur_pitch"
+    mycursor.execute(query17)
+    pitch_rows = mycursor.fetchall()
+
     mycursor.close()
     mydb.close()
 
@@ -488,6 +492,14 @@ def murmur_show():
     diamond_count = shape_result.get('Diamond',0)
     plateau_count = shape_result.get('Plateau',0)
 
+    pitch_result = {}
+    for row in pitch_rows:
+        pitch_result[row[0]] = row[1]
+    print(pitch_result)
+    low_pitch_count = shape_result.get('Low',0)
+    medium_pitch_count = shape_result.get('Medium',0)
+    high_pitch_count = shape_result.get('High',0)
+
     result = {'message':'data processed successfully',
               'pid':pid,
               'disease':disease,
@@ -504,7 +516,10 @@ def murmur_show():
               'decrescendo_count': decrescendo_count,
               'diamond_count':diamond_count,
               'plateau_count':plateau_count,
-              'name': username
+              'name': username,
+              'low_pitch_count' : low_pitch_count,
+              'medium_pitch_count' : medium_pitch_count,
+              'high_pitch_count' : high_pitch_count
               }
     # print(result)
     if output[1] == "Absent":
