@@ -428,7 +428,7 @@ def murmur_show():
         disease = predict_disease(detail[3],output[3],output[4],output[5])
     else:
         print("detail None")
-        disease = ""
+        disease = predict_disease("",output[3],output[4],output[5])
     print("disease : ", disease)
 
     query13 = "select patient_id from patient_details where doctor_name=%s"
