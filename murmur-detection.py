@@ -304,34 +304,37 @@ def predict():
     clinical_outcome = normal_abnormal_dictionary[np.argmax(outcome)]
     print("clinical outcome : ",clinical_outcome)
     ########################################################################
-    max_length = 50000
-    target_sample_rate = 4000
+    if murmur_case == "Present":
+        max_length = 50000
+        target_sample_rate = 4000
 
-    resampled_sample_rate, truncated_resampled_data = truncate_resample_and_pad_wav(audio_,sampling_rate, max_length, target_sample_rate)
-    input_data = truncated_resampled_data.astype("float32")
-    input_data = input_data.reshape(1,50000,1)
+        resampled_sample_rate, truncated_resampled_data = truncate_resample_and_pad_wav(audio_,sampling_rate, max_length, target_sample_rate)
+        input_data = truncated_resampled_data.astype("float32")
+        input_data = input_data.reshape(1,50000,1)
 
-    ####################################  Murmur pitch ###########################
-    output = pitch_model.predict(input_data)
-    pitch_dictionary = {0: "High", 1: "Low", 2: "Medium"}
-    murmur_pitch = pitch_dictionary[np.argmax(output)]
-    print("murmur_pitch : ",murmur_pitch)
+        ####################################  Murmur pitch ###########################
+        output = pitch_model.predict(input_data)
+        pitch_dictionary = {0: "High", 1: "Low", 2: "Medium"}
+        murmur_pitch = pitch_dictionary[np.argmax(output)]
+        print("murmur_pitch : ",murmur_pitch)
 
-    ######################################murmur shape############################3
-    
-    m_shape = shape_model.predict(input_data)
-    shape_dict = {0:"Decrescendo", 1:"Diamond", 2:"Plateau"}
+        ###################################### murmur shape ############################3
+        
+        m_shape = shape_model.predict(input_data)
+        shape_dict = {0:"Decrescendo", 1:"Diamond", 2:"Plateau"}
 
-    murmur_shape = shape_dict[np.argmax(m_shape)]
-    print(murmur_shape)
+        murmur_shape = shape_dict[np.argmax(m_shape)]
+        print(murmur_shape)
 
-    ############################  Murmur timing ################################################
-    
-    m_timing = shape_model.predict(input_data)
-    timing_dict = {0:"Early Systolic", 1:"Holo Systolic", 2:"Mid Systolic"}
+        ############################  Murmur timing ################################################
+        
+        m_timing = shape_model.predict(input_data)
+        timing_dict = {0:"Early Systolic", 1:"Holo Systolic", 2:"Mid Systolic"}
 
-    murmur_timing = timing_dict[np.argmax(m_timing)]
-    print(murmur_timing)
+        murmur_timing = timing_dict[np.argmax(m_timing)]
+        print(murmur_timing)
+    else:
+        murmur_timing, murmur_pitch, murmur_shape = "","",""
 
     mydb = mysql.connector.connect(
         host="demo-database-1.cvs5fl0cptbn.eu-north-1.rds.amazonaws.com",
