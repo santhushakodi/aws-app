@@ -508,6 +508,7 @@ def murmur_show():
         result['murmur_pitch'] = ""
         result['murmur_shape'] = ""
         result['murmur_timing'] = ""
+        result['disease'] = ""
     
     
     # return render_template("index.html", wav_data = encoded_wav)
