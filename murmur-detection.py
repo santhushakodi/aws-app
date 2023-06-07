@@ -86,9 +86,9 @@ def truncate_resample_and_pad_wav(audio_data, sample_rate, max_length, target_sa
 def predict_disease(best_heard, timing, pitch, shape):
     print("predict disease : ", best_heard,timing,pitch,shape)
     timing_disease, pitch_disease, shape_disease, disease = "","","",""
-    if timing == "Holo Systolic" and best_heard == None:
+    if timing == "Holo Systolic" and best_heard == "":
         timing_disease = "Mitral Regurgitation and Ventricular Septal Defect are possible based on murmur timing."
-    elif timing == "Mid Systolic" and best_heard == None:
+    elif timing == "Mid Systolic" and best_heard == "":
         timing_disease = "Aortic Stenosis and Atrial Septal Defect are possible based on murmur timing."
     elif timing == "Holo Systolic" and best_heard == "MV":
         timing_disease = "Mitral Regurgitation is possible based on murmur timing."
@@ -99,9 +99,9 @@ def predict_disease(best_heard, timing, pitch, shape):
     elif timing == "Mid Systolic" and best_heard == "PV":
         timing_disease = "Atrial Septal Defect are possible based on murmur timing."
     
-    if shape == "Plateau" and best_heard == None:
+    if shape == "Plateau" and best_heard == "":
         shape_disease = "Mitral Regurgitation and Ventricular Septal Defect are possible based on murmur shape."
-    elif shape == "Diamond" and best_heard == None:
+    elif shape == "Diamond" and best_heard == "":
         shape_disease = "Aortic Stenosis and Atrial Septal Defect are possible based on murmur shape."
     elif shape == "Plateau" and best_heard == "MV":
         shape_disease = "Mitral Regurgitation is possible based on murmur shape."
@@ -113,7 +113,7 @@ def predict_disease(best_heard, timing, pitch, shape):
         shape_disease = "Atrial Septal Defect is possible based on murmur shape."
 
     
-    if pitch == "High" and best_heard == None:
+    if pitch == "High" and best_heard == "":
         pitch_disease = "Mitral Regurgitation, Atrial Septal Defect and Ventricular Septal Defect are possible based on murmur pitch."
     elif pitch == "High" and best_heard == "MV":
         pitch_disease = "Mitral Regurgitation is possible based on murmur pitch."
