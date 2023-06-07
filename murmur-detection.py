@@ -688,6 +688,7 @@ def render_audio():
         
         query13 = "select * from pcg_table where patient_id=%s"
         data = (id,)
+        print("audio data id : ", data)
         mycursor.execute(query13, data)
         # commit the transaction
         detail = mycursor.fetchone()
