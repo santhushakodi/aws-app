@@ -300,7 +300,7 @@ def predict():
     normal_abnormal_input = normal_abnormal_input.reshape(1,200000)
     print(np.shape(np.array(normal_abnormal_input)))
     outcome = normal_abnormal_model.predict(normal_abnormal_input)
-    normal_abnormal_dictionary = {0: "Abnormal", 1: "Normal"}
+    normal_abnormal_dictionary = {1: "Abnormal", 0: "Normal"}
     clinical_outcome = normal_abnormal_dictionary[np.argmax(outcome)]
     print("clinical outcome : ",clinical_outcome)
     ########################################################################
